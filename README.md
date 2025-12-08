@@ -1,11 +1,19 @@
 # SDLMA-GUI
 
-# COMMENTS AND REFACTORING
-Still needs some refactoring and comments. COMING SOON!
-
 ## Usage
+To use the program just run the main.py file and make sure the src directory
+is selected as a source root. 
+```shell
+python3 main.py
+```
+No executable has been provided. Reasons see [Notice](#Notice)
 
 ## Instatllation
+Install requirements.txt and make sure custom SDLMA-Core 
+git repostiory has been installed successfully
+```shell
+pip install -r requirements.txt
+```
 
 ## Notice
 This project depends on the open source efforts of [sdypy](https://github.com/sdypy/sdypy) and wouldn't

@@ -5,10 +5,8 @@ from PySide6 import QtCore
 from PySide6.QtCore import QAbstractListModel
 from PySide6.QtWidgets import QFileDialog
 from sdlma_hardware.sdlma_hardware import SDLMANiTask
-from sdlma_modal_analysis.sdlma_measurement import (
-    SDLMAMeasurement,
-    SDLMATimeSeriesSEP005,
-)
+from sdlma_modal_analysis.sdlma_measurement import (SDLMAMeasurement,
+                                                    SDLMATimeSeriesSEP005)
 
 from util.models import data_proto, row_count_proto
 
@@ -36,7 +34,7 @@ class SDLMAChannel(QtCore.QAbstractListModel):
     def data(self, index, role):
         return data_proto(self.channels, index, role)
 
-    def rowCount(self, index):
+    def rowCount(self, index: QtCore.QModelIndex):
         return row_count_proto(self.channels)
 
     def get_selected_channels(self):
@@ -51,18 +49,34 @@ class SDLMAGuiTask:
 
     def __init__(
         self,
-        name,
-        num_impacts,
-        impact_time,
-        sampling_freq,
-        overflow_samples,
-        double_impact_limit,
-        channels,
+        name: str,
+        num_impacts: int,
+        impact_time: float,
+        sampling_freq: float,
+        overflow_samples: float,
+        double_impact_limit: float,
+        channels: list,
         media_player,
-        meas_task_done,
-        meas_start_timer,
-        meas_stop_timer,
+        meas_task_done: callable,
+        meas_start_timer: callable,
+        meas_stop_timer: callable,
     ):
+        """
+        Class that handles measurement tasks from the GUI Side
+        CURRENTLY VERY UGLY!!
+        :param name: The name of the task
+        :param num_impacts: The number of impacts
+        :param impact_time: The impact time
+        :param sampling_freq: The sampling frequency
+        :param overflow_samples: Overflow samples for double impact det
+        :param double_impact_limit: Double impact limit for double impact det
+        :param channels: The channels that shall be utilized
+        :param media_player: The media player to give audio feedback
+        :param meas_task_done: The task done function to execute when the
+        task has been performed
+        :param meas_start_timer: The start timer function
+        :param meas_stop_timer: The stop timer function
+        """
         self.name = name
         self.num_impacts = num_impacts
         self.impact_time = impact_time
@@ -104,6 +118,14 @@ class SDLMAGuiTask:
         number_of_samples,
         callback_data,
     ):
+        """
+        Callback function for tasks after n samples
+        :param task_handle: UNUSED
+        :param every_n_samples_event_type: UNUSED
+        :param number_of_samples: The number of samples
+        :param callback_data: UNUSED
+        :return:
+        """
 
         data = np.array(self.task.read(number_of_samples))
         exc, resp = ([], [])
@@ -149,6 +171,13 @@ class SDLMAGuiTask:
         ] = time
 
     def done(self, task_handle, status, callback_data):
+        """
+        Callback function when the measurement is done
+        :param task_handle: UNUSED
+        :param status: UNUSED
+        :param callback_data: UNUSED
+        :return:
+        """
         self.stop()
         self.done_impacts += 1
         if self.done_impacts < self.impacts_to_perform:
@@ -188,13 +217,17 @@ class SDLMAGuiTask:
         return 0
 
     def start(self):
-        """ """
+        """
+        Method to start the task
+        """
         self.meas_task_done(False)
         self.media_player.play()
         self.task.start()
 
     def stop(self):
-        """ """
+        """
+        Method to stop the task
+        """
         self.task.stop()
 
     def get_clean_impacts(self, arr):
@@ -284,14 +317,21 @@ class SDLMAGuiTask:
             info["directions"].append(gui_channel.channel.direction)
         return exc_info, resp_info
 
-    def check_double_impact(self):
+    def check_double_impact(self) -> list:
+        """
+        Method to check for double impacts
+        """
         double_impacts = self.sdlma_measurement.check_double_impact(
             self.overflow_samples,
             self.double_impact_limit,
         )
         return self.add_new_impacts(double_impacts)
 
-    def add_new_impacts(self, double_impacts):
+    def add_new_impacts(self, double_impacts: list) -> list:
+        """
+        Method to add new impacts depending on the length of new impacts
+        :param double_impacts: new double impact list
+        """
         new_impacts = len(double_impacts) - len(self.double_impact_indices)
         if new_impacts > 0:
             self.impacts_to_perform += new_impacts
@@ -300,7 +340,10 @@ class SDLMAGuiTask:
         return double_impacts
 
     def resize_arrays(self):
-
+        """
+        Method to resize arrays after adding or removing impacts
+        :return:
+        """
         # Extend time_data
         new_time_data = np.zeros(
             self.time_data.shape[0] + self.num_samples, dtype=np.float64
@@ -341,5 +384,5 @@ class SDLMATaskModel(QAbstractListModel):
     def data(self, index, role):
         return data_proto(self.tasks, index, role)
 
-    def rowCount(self, index):
+    def rowCount(self, index: QtCore.QModelIndex):
         return row_count_proto(self.tasks)

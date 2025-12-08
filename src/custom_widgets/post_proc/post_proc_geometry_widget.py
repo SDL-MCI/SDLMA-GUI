@@ -10,6 +10,10 @@ class GeometryWidget(QWidget):
     select_color = [255, 0, 0]  # red
 
     def __init__(self, parent=None, *args, **kwargs):
+        """
+        Custom Widget Class connected to the post processing subsection
+        to visualize the analyzed structure using pyvista.
+        """
         super().__init__(parent, *args, **kwargs)
         self.actors = []
         self.points_poly = None
@@ -24,14 +28,21 @@ class GeometryWidget(QWidget):
         self.setLayout(self.layout)
         self.connector = ""
 
-    def setup(self):
+    def init(self):
+        """
+        Method to initialize the geometry widget
+        """
         self.selected_nodes = []
         self.line_nodes = []
         self.face_nodes = []
         self.plotter = pvqt.QtInteractor(self)
         self.layout.addWidget(self.plotter.interactor)
 
-    def create_nodes(self, points):
+    def create_nodes(self, points: list[tuple[float, float, float]]):
+        """
+        Method to create the pyvista poly data from the given 3d points
+        :param points: A list of 3d points
+        """
         self.points = points
         self.points_poly = pv.PolyData(points)
 
@@ -59,7 +70,11 @@ class GeometryWidget(QWidget):
         )
         self.plotter.show()
 
-    def change_connector(self, connector):
+    def change_connector(self, connector: str):
+        """
+        Method to update the meshing connector
+        :param connector: The connector that shall be utilized for meshing
+        """
         self.connector = connector
         if self.plotter is not None:
             self.plotter.disable_picking()
@@ -76,6 +91,11 @@ class GeometryWidget(QWidget):
                 )
 
     def mesh_callback(self, poly_data):
+        """
+        The mesh callback function that is registered to the mesh picking
+        event.
+        :param poly_data: The poly data object from the mesh callback
+        """
         picked_actor = self.plotter.picked_actor
         if picked_actor in self.actors:
             self.plotter.remove_actor(picked_actor)
@@ -101,6 +121,10 @@ class GeometryWidget(QWidget):
                         break
 
     def point_callback(self, point):
+        """
+        Surface point seleciton callback for the meshing
+        :param point: The selectd point
+        """
         point_idx = self.points_poly.find_closest_point(point)
         if point_idx not in self.selected_nodes:
             self.colors[point_idx] = self.select_color
@@ -112,6 +136,10 @@ class GeometryWidget(QWidget):
         self.check_connections()
 
     def check_connections(self):
+        """
+        Method to check if a valid connection has been created according
+        to the defined connectors
+        """
         nodes = None
         match self.connector:
             case "line":
@@ -139,7 +167,11 @@ class GeometryWidget(QWidget):
             self.reset_colors()
             self.update_geometry(nodes)
 
-    def update_geometry(self, nodes):
+    def update_geometry(self, nodes: list):
+        """
+        Method to update the geometry with the given nodes
+        :param nodes: A list containg connected nodes
+        """
         actor = None
         if len(nodes) == 2:
             line = pv.Line(
@@ -155,17 +187,28 @@ class GeometryWidget(QWidget):
         self.actors.append(actor)
 
     def reset_colors(self):
+        """
+        Method top reset the color of the points to default
+        """
         for i in range(len(self.colors)):
             self.colors[i] = self.default_color
         self.points_poly["colors"] = self.colors  # Refresh
 
     def clear(self):
+        """
+        Method to clear the complete geometry viewer
+        """
         if self.plotter:
             self.layout.removeWidget(self.plotter)  # removes from layout
             self.plotter.setParent(None)  # detaches it from the parent widget
             self.plotter.deleteLater()  # schedules cleanup
 
-    def update_points(self, points):
+    def update_points(self, points: list[tuple[float, float, float]]):
+        """
+        Method to udpate the points
+        :param points: Method to update the poly data points(nodes) with the
+        new points
+        """
         self.points_poly.points = points
 
         for actor in self.actors:
@@ -175,6 +218,9 @@ class GeometryWidget(QWidget):
         self.plotter.render()
 
     def redraw(self):
+        """
+        Method to redraw the mesh
+        """
         for line in self.line_nodes:
             self.update_geometry(line)
         for face in self.face_nodes:

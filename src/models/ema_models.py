@@ -11,7 +11,7 @@ class SignalModel(QtCore.QAbstractListModel):
     def data(self, index, role):
         return data_proto(self.signals, index, role)
 
-    def rowCount(self, index):
+    def rowCount(self, index: QtCore.QModelIndex):
         return row_count_proto(self.signals)
 
 
@@ -23,5 +23,5 @@ class EMAModel(QtCore.QAbstractListModel):
     def data(self, index, role):
         return data_proto(self.measurements, index, role)
 
-    def rowCount(self, index):
+    def rowCount(self, index: QtCore.QModelIndex):
         return row_count_proto(self.measurements)

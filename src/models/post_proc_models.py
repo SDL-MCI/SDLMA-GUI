@@ -11,5 +11,5 @@ class FRFModel(QtCore.QAbstractListModel):
     def data(self, index, role):
         return data_proto(self.frfs, index, role)
 
-    def rowCount(self, index):
+    def rowCount(self, index: QtCore.QModelIndex):
         return row_count_proto(self.frfs)

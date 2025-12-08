@@ -3,24 +3,23 @@ import shutil
 
 import numpy as np
 from PySide6 import QtCore, QtGui
-from PySide6.QtWidgets import (
-    QComboBox,
-    QDialog,
-    QFileDialog,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QWidget,
-)
+from PySide6.QtWidgets import (QComboBox, QDialog, QFileDialog, QHBoxLayout,
+                               QLabel, QLineEdit, QWidget)
 from sdlma_modal_analysis.sdlma_ema import SDLMAEMA
 from sdlma_modal_analysis.sdlma_uff import SDLMAUFF
+from PySide6.QtCore import Slot
 
 from ui import sdlma_mp_to_nodes_gui
 from util.models import data_proto, row_count_proto
+from custom_widgets.post_proc.post_proc_ema_window import EmaWindow
 
 
 class PostProcMainWidget(QWidget):
     def __init__(self, parent=None, *args, **kwargs):
+        """
+        Custom Widget Class connected to the Post Process tab of the PySide6
+        GUI.
+        """
         super().__init__(parent, *args, **kwargs)
         self.deformed_nodes = None
         self.ui = None
@@ -34,16 +33,33 @@ class PostProcMainWidget(QWidget):
         self.max_step = 50
 
     def init(self, ui):
+        """
+        Method to initialize the post proc widget.
+        :param ui: The main ui object created by PySide6.
+        """
         self.ui = ui
 
     def init_line_edits(self):
+        """
+        Method to assign input constraints to the line edits
+        of the post processing tab.
+        """
         i_validator = QtGui.QDoubleValidator(bottom=1, top=100, decimals=3)
         self.ui.post_proc_line_edit_deformation_scale.setValidator(i_validator)
 
+    @Slot()
     def post_proc_button_load_geometry_pressed(self):
+        """
+        Slot method that allows the user to load a geometry file.
+        Format:
+        x1 y1 z1
+        x2 y2 z2
+        x3 y3 z3
+        xn yn zn
+        """
         filename, _ = QFileDialog.getOpenFileName(filter="*.txt")
         if filename:
-            self.ui.post_proc_vispy.setup()
+            self.ui.post_proc_vispy.init()
             nodes = []
             with open(filename, "r") as f:
                 for line in f.readlines():
@@ -60,14 +76,22 @@ class PostProcMainWidget(QWidget):
             self.ui.post_proc_button_load_ema.setEnabled(True)
             self.ui.post_proc_button_save_geometry.setEnabled(True)
 
+    @Slot()
     def post_proc_button_load_uff_pressed(self):
+        """
+        Slot method to load a uff file
+        """
         filename, _ = QFileDialog.getOpenFileName(filter="*.unv *.uff")
         if filename:
             shutil.copyfile(filename, filename + "_old")
             self.sdlma_uff = SDLMAUFF(name="", filename=filename)
             self.sdlma_uff.get_points()
 
+    @Slot()
     def post_proc_button_load_ema_pressed(self):
+        """
+         Slot method that allows the user to load a ema file.
+        """
         filename, _ = QFileDialog.getOpenFileName(filter="*.h5")
         if filename:
             self.sdlma_ema = SDLMAEMA.import_from_hd5f_file(filename)
@@ -82,11 +106,10 @@ class PostProcMainWidget(QWidget):
             self.init_mode_combo_box(self.sdlma_ema.nat_freq)
             self.post_proc_combo_button_mode_changed(0)
 
-    def init_mode_combo_box(self, nat_freqs):
+    def init_mode_combo_box(self, nat_freqs: list):
         """
-
-        :param nat_freqs:
-        :return:
+        Helper method to initialize the combo box with the given natural frequencies.
+        :param nat_freqs: list of nat frequencies.
         """
         self.ui.post_proc_combo_box_mode.clear()
         if self.sdlma_ema:
@@ -95,7 +118,13 @@ class PostProcMainWidget(QWidget):
                     str("%.2f Hz" % nat_freq)
                 )
 
-    def post_proc_combo_button_mode_changed(self, idx):
+    @Slot()
+    def post_proc_combo_button_mode_changed(self, idx: QtCore.QModelIndex):
+        """
+        Slot Method to calculate the deformed nodes
+        for the given natural frequency according to its index.
+        :param idx: The index of the nat frequency in the combo box.
+        """
         if self.sdlma_ema:
             scale = float(self.ui.post_proc_line_edit_deformation_scale.text())
             self.deformed_nodes = SDLMAUFF.calculate_displacement_period(
@@ -107,7 +136,12 @@ class PostProcMainWidget(QWidget):
                 scale=scale,
             )
 
+    @Slot()
     def post_proc_button_show_deformation_pressed(self):
+        """
+        Slot Method to showcase the deformation for the selected nat
+        frequencies.
+        """
         self.show_deformation = not self.show_deformation
         if self.show_deformation:
             self.timer.start(2000)
@@ -116,12 +150,22 @@ class PostProcMainWidget(QWidget):
             self.ui.post_proc_vispy.update_points(self.nodes)
 
     def update_deformation(self):
+        """
+        Method to update the current view of the deformation
+        """
         if self.step == self.max_step:
             self.step = 0
         self.ui.post_proc_vispy.update_points(self.deformed_nodes[self.step])
         self.step += 1
 
-    def post_proc_connector_changed(self, id, is_toggled):
+    @Slot()
+    def post_proc_connector_changed(self, id: int, is_toggled: bool):
+        """
+        Slot method to update the connector used for meshing
+        :param id: The id of the connector from the selector
+        :param is_toggled: Bool indicating if it has been toggled or untoggled
+        :return:
+        """
         if is_toggled:
             self.select_connector(id)
 
@@ -140,12 +184,20 @@ class PostProcMainWidget(QWidget):
         self.ui.post_proc_vispy.change_connector(connector)
 
     def check_sdlma_uff(self):
+        """
+        Helper Method to check if the sdlmauff object exists and otherwise
+        creates it.
+        """
         if not self.sdlma_uff:
             filename, _ = QFileDialog.getSaveFileName(filter="*.unv *.uff")
             if filename:
                 self.sdlma_uff = SDLMAUFF(name="", filename=filename)
 
+    @Slot()
     def post_proc_button_save_geometry_pressed(self):
+        """
+        Slot method to save the geometry in the uff file
+        """
         self.check_sdlma_uff()
         self.sdlma_uff.write_coord_system()
         self.sdlma_uff.write_units()
@@ -155,16 +207,28 @@ class PostProcMainWidget(QWidget):
             self.ui.post_proc_vispy.face_nodes,
         )
 
+    @Slot()
     def post_proc_button_save_ema_pressed(self):
+        """
+        Slot Method to save the ema result in the uff file
+        """
         self.check_sdlma_uff()
         self.sdlma_uff.write_modes(self.sdlma_ema, self.mp_to_node)
         self.sdlma_uff.write_frfs(self.sdlma_ema, self.mp_to_node)
 
+    @Slot()
     def post_proc_button_save_all_pressed(self):
+        """
+        Slot Method to save all in the uff file
+        """
         self.post_proc_button_save_geometry_pressed()
         self.post_proc_button_save_ema_pressed()
 
+    @Slot()
     def post_proc_button_clear_pressed(self):
+        """
+        Slot method to clear the complete widget
+        """
         self.sdlma_uff = None
         self.sdlma_ema = None
         self.nodes = None
@@ -178,41 +242,3 @@ class PostProcMainWidget(QWidget):
         self.ui.post_proc_button_load_geometry.setEnabled(True)
 
 
-class EmaWindow(QDialog):
-    def __init__(self, node_list, mp_list, parent=None, *args, **kwargs):
-        super().__init__(parent)
-        self.ui = sdlma_mp_to_nodes_gui.Ui_Dialog()
-        self.ui.setupUi(self)
-        self.resp_signals_model = FRFModel()
-        self.node_list = node_list
-        self.mp_list = mp_list
-        self.mp_to_node = {}
-        self.init()
-
-    def init(self):
-        nodes = []
-
-        for i, node in enumerate(self.node_list):
-            nodes.append(str(i + 1))
-
-        for i, mp in enumerate(self.mp_list):
-            mp_label = QLabel("Name")
-            mp_line_edit = QLineEdit(mp, readOnly=True)
-            node_label = QLabel("Node")
-            qwidget = QWidget(parent=self.ui.mp_to_nodes_widget)
-            layout = QHBoxLayout()
-            qwidget.setLayout(layout)
-            node_combo_box = QComboBox(parent=qwidget)
-            node_combo_box.addItems(nodes)
-            layout.addWidget(mp_label)
-            layout.addWidget(mp_line_edit)
-            layout.addWidget(node_label)
-            layout.addWidget(node_combo_box)
-            self.ui.mp_to_nodes_layout.addWidget(qwidget)
-
-    def mp_to_nodes_button_done_pressed(self):
-        for i, combo_box in enumerate(
-            self.ui.mp_to_nodes_widget.findChildren(QComboBox)
-        ):
-            self.mp_to_node[self.mp_list[i]] = int(combo_box.currentText())
-        self.window().accept()
