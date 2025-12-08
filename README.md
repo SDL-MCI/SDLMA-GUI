@@ -8,6 +8,9 @@ python3 main.py
 ```
 No executable has been provided. Reasons see [Notice](#Notice)
 
+### Double Impact Selection
+Double-click the tab to add or remove double impact selection.
+
 ## Instatllation
 Install requirements.txt and make sure custom SDLMA-Core 
 git repostiory has been installed successfully
