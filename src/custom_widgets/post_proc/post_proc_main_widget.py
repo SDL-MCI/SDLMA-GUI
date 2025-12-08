@@ -19,7 +19,6 @@ from ui import sdlma_mp_to_nodes_gui
 from util.models import data_proto, row_count_proto
 
 
-# https://github.com/pyqtgraph/pyqtgraph/blob/4951bd743ef7e2a5198615573167301c9603b72f/examples/linkedViews.py
 class PostProcMainWidget(QWidget):
     def __init__(self, parent=None, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
@@ -48,15 +47,12 @@ class PostProcMainWidget(QWidget):
             nodes = []
             with open(filename, "r") as f:
                 for line in f.readlines():
-                    # https://stackoverflow.com/questions/4703390/how-to
-                    # -extract-a-floating-number-from-a-string
                     nodes.append(
                         tuple(re.findall(r"[-+]?(" r"?:\d*\.*\d+)", line))
                     )
             self.ui.post_proc_vispy.lower()
             self.ui.post_proc_vispy_settings.raise_()
             self.nodes = np.array(nodes, dtype=float)
-            # self.ui.post_proc_vispy.connector = "line"
             self.select_connector(self.ui.post_proc_connector.checkedId())
             self.ui.post_proc_vispy.create_nodes(self.nodes)
             self.ui.post_proc_button_load_geometry.setEnabled(False)
@@ -75,13 +71,6 @@ class PostProcMainWidget(QWidget):
         filename, _ = QFileDialog.getOpenFileName(filter="*.h5")
         if filename:
             self.sdlma_ema = SDLMAEMA.import_from_hd5f_file(filename)
-            # self.ui.post_proc_line_edit_nat_freq.setText(
-            #     str(self.sdlma_ema.nat_freq)
-            # )
-            # self.ui.post_proc_line_edit_daming_coeff.setText(
-            #     str(self.sdlma_ema.nat_xi)
-            # )
-
             ema_window = EmaWindow(
                 self.nodes, self.sdlma_ema.get_unique_names()
             )
@@ -94,6 +83,11 @@ class PostProcMainWidget(QWidget):
             self.post_proc_combo_button_mode_changed(0)
 
     def init_mode_combo_box(self, nat_freqs):
+        """
+
+        :param nat_freqs:
+        :return:
+        """
         self.ui.post_proc_combo_box_mode.clear()
         if self.sdlma_ema:
             for nat_freq in nat_freqs:
@@ -222,15 +216,3 @@ class EmaWindow(QDialog):
         ):
             self.mp_to_node[self.mp_list[i]] = int(combo_box.currentText())
         self.window().accept()
-
-
-class FRFModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, frfs=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.frfs = frfs or []
-
-    def data(self, index, role):
-        return data_proto(self.frfs, index, role)
-
-    def rowCount(self, index):
-        return row_count_proto(self.frfs)

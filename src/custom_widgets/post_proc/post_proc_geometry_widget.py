@@ -2,15 +2,9 @@ import numpy as np
 import pyvista as pv
 import pyvistaqt as pvqt
 from PySide6.QtWidgets import QStackedLayout, QWidget
-from vtkmodules.util.data_model import PolyData
 
 
-# https://vispy.org/gallery/scene/mesh_normals.html
-# https://stackoverflow.com/questions/67377285/how-to-set-widget-for-vispy-use
-# https://vispy.org/gallery/scene/realtime_data/ex01_embedded_vispy.html
-# https://www.geeksforgeeks.org/python/pyvista-and-qt-integration/
-# https://stackoverflow.com/questions/72685864/creation-a-2d-mesh-with-pyvista-and-coloring-different-groups-of-cells-with-diff
-class GeometryViewer(QWidget):
+class GeometryWidget(QWidget):
     colors = []
     default_color = [179, 204, 204]  # gray/blueish
     select_color = [255, 0, 0]  # red
@@ -177,7 +171,6 @@ class GeometryViewer(QWidget):
         for actor in self.actors:
             self.plotter.remove_actor(actor)
             self.actors.remove(actor)
-
         self.redraw()
         self.plotter.render()
 

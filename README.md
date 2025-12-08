@@ -36,5 +36,5 @@ https://vispy.org/gallery/scene/realtime_data/ex01_embedded_vispy.html \
 https://www.geeksforgeeks.org/python/pyvista-and-qt-integration/ \
 https://stackoverflow.com/questions/72685864/creation-a-2d-mesh-with-pyvista-and-coloring-different-groups-of-cells-with-diff \
 https://stackoverflow.com/questions/4703390/how-to-extract-a-floating-number-from-a-string \
-https://stackoverflow.com/questions/78922304/qt-pyside6-add-widget-to-qscrollarea-during-runtime-not-showing-up \ 
-https://stackoverflow.com/questions/9374063/remove-all-items-from-a-layout/9383780#9383780 \ 
+https://stackoverflow.com/questions/78922304/qt-pyside6-add-widget-to-qscrollarea-during-runtime-not-showing-up    \
+https://stackoverflow.com/questions/9374063/remove-all-items-from-a-layout/9383780#9383780

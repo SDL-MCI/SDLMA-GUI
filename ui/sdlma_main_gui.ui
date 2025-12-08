@@ -39,7 +39,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="setup_tab">
        <property name="sizePolicy">
@@ -51,15 +51,7 @@
        <attribute name="title">
         <string>Setup</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="teds_test">
-          <property name="text">
-           <string>teds test</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QGridLayout" name="gridLayout_5"/>
       </widget>
       <widget class="QWidget" name="meas_tab">
        <property name="sizePolicy">
@@ -1140,15 +1132,7 @@
        <attribute name="title">
         <string>OMA</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QGridLayout" name="gridLayout_6"/>
       </widget>
       <widget class="QWidget" name="post_processing_tab">
        <property name="sizePolicy">
@@ -1534,7 +1518,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_9">
               <item row="0" column="0">
-               <widget class="GeometryViewer" name="post_proc_vispy" native="true">
+               <widget class="GeometryWidget" name="post_proc_vispy" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -1727,7 +1711,7 @@
   <customwidget>
    <class>MeasMainWidget</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/meas/main_widget</header>
+   <header>custom_widgets/meas/meas_main_widget</header>
    <container>1</container>
    <slots>
     <slot>meas_line_edit_meas_time_change()</slot>
@@ -1759,13 +1743,13 @@
   <customwidget>
    <class>MeasPlotWidget</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/meas/plot_widget</header>
+   <header>custom_widgets/meas/meas_plot_widget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>EmaMainWidget</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/ema/main_widget</header>
+   <header>custom_widgets/ema/ema_main_widget</header>
    <container>1</container>
    <slots>
     <slot>ema_button_load_pressed()</slot>
@@ -1787,13 +1771,13 @@
   <customwidget>
    <class>EmaPlotWidget</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/ema/plot_widget</header>
+   <header>custom_widgets/ema/ema_plot_widget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>PostProcMainWidget</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/post_proc/main_widget</header>
+   <header>custom_widgets/post_proc/post_proc_main_widget</header>
    <container>1</container>
    <slots>
     <slot>post_proc_button_load_geometry_pressed()</slot>
@@ -1809,30 +1793,14 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>GeometryViewer</class>
+   <class>GeometryWidget</class>
    <extends>QWidget</extends>
-   <header>custom_widgets/post_proc/geometry_viewer</header>
+   <header>custom_widgets/post_proc/post_proc_geometry_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>teds_test</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>teds_test()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>71</x>
-     <y>445</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>295</x>
-     <y>1041</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>ema_line_edit_nat_freq</sender>
    <signal>editingFinished()</signal>

@@ -2,11 +2,10 @@
     "files": [
         "sdlma_channel_gui.ui",
         "sdlma_meas_gui.ui",
-        "sdlma_gui.ui",
+        "sdlma_main_gui.ui",
         "sdlma_task_gui.ui",
         "sdlma_teds_gui.ui",
-        "sdlma_geometry_viewer_settings.ui",
-        "sdlma_mp_to_nodes_gui.ui",
-        "test.ui"
+        "sdlma_geometry_gui.ui",
+        "sdlma_mp_to_nodes_gui.ui"
     ]
 }

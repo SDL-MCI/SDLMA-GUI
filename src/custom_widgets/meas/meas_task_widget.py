@@ -4,7 +4,7 @@ from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QDialog, QFileDialog, QLineEdit
 from sdlma_hardware.sdlma_hardware import SDLMAHardware, SDLMANiTask
 
-from models.hardware_model import ChannelModel, PyMAGuiChannel
+from models.meas_models import SDLMAChannel, SDLMAGuiChannel
 from ui import sdlma_channel_gui, sdlma_task_gui
 from util.line_edits import check_line_edits_valid, set_line_edit_change_func
 
@@ -14,7 +14,7 @@ class TaskWindow(QDialog):
         super().__init__()
         self.ui = sdlma_task_gui.Ui_Dialog()
         self.ui.setupUi(self)
-        self.available_channels_model = ChannelModel()
+        self.available_channels_model = SDLMAChannel()
         self.ui.meas_list_available_channels.setModel(
             self.available_channels_model
         )
@@ -26,10 +26,10 @@ class TaskWindow(QDialog):
         )
         self.init_line_edits()
         self.meas_button_refresh_channels_pressed()
-        self.init_task(task_data)
+        self.meas_init_task(task_data)
         self.meas_is_task_valid()
 
-    def init_task(self, task_data):
+    def meas_init_task(self, task_data):
         if task_data:
             self.ui.meas_line_edit_task_name.setText(task_data["name"])
             self.ui.meas_line_edit_num_impacts.setText(
@@ -97,7 +97,7 @@ class TaskWindow(QDialog):
         hw.get_available_ni_channels()
         gui_channels = []
         for channel in hw.sdlma_channels:
-            gui_channels.append(PyMAGuiChannel(channel=channel))
+            gui_channels.append(SDLMAGuiChannel(channel=channel))
         self.available_channels_model.channels = gui_channels
         self.available_channels_model.layoutChanged.emit()
 

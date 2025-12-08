@@ -28,22 +28,6 @@ class MeasPlotWidget(QWidget):
         self.qt_graphs = []
         self.tabs = []
 
-    def init_old(self, pyqtgraph_widget):
-        styles = {"color": "b", "font-size": "18px"}
-        self.qt_graph = pyqtgraph_widget
-        self.qt_graph.setBackground("w")
-        self.exc_plot = self.create_plot(
-            0, 0, "Excitation", "Time / s", "f / N", styles
-        )
-        self.resp_plot = self.create_plot(
-            1,
-            0,
-            "Response",
-            "Time / s",
-            "a / ms<sup>-2</sup>",
-            styles,
-        )
-
     def init(self, ui):
         self.ui = ui
         self.layout = QVBoxLayout()
@@ -57,7 +41,6 @@ class MeasPlotWidget(QWidget):
         self.setup_plot_lines(channels, 0, num_impacts + 1)
 
     def create_tabs(self, start_idx, end_idx, channels):
-
         for i in range(start_idx, end_idx):
             tab_name = f"meas_tab_impact_{i}"
             self.create_tab(tab_name, f"Impact {i}")
@@ -66,31 +49,29 @@ class MeasPlotWidget(QWidget):
                 self.qt_graphs[i + 1], f"exc_imp_{i}", f"resp_imp_{i}"
             )
 
+    def remove_tab(self):
+        self.resp_plots.pop()
+        self.exc_plots.pop()
+        self.qt_graphs.pop()
+        self.tabs.pop()
+        self.ui.meas_tab_plot.removeTab(self.ui.meas_tab_plot.count() - 1)
+
     def mark_double_impacts(self, double_impact_indices):
-        for i in double_impact_indices:
-            icon = self.style().standardIcon(
-                QStyle.StandardPixmap.SP_DialogCancelButton
-            )
-            tab_idx = self.ui.meas_tab_plot.indexOf(
-                self.ui.meas_tab_plot.findChild(
-                    QWidget, f"meas_tab_impact_{i}"
-                )
-            )
-            self.ui.meas_tab_plot.setTabIcon(tab_idx, icon)
+        for idx in double_impact_indices:
+            self.mark_unmark_double_impacts(idx+1, mark=True)
         self.ui.meas_tab_plot.tabBar().update()
 
     def mark_unmark_double_impacts(self, index, mark):
-        if mark:
-            icon = self.style().standardIcon(
-                QStyle.StandardPixmap.SP_DialogCancelButton
-            )
-        else:
-            icon = QIcon()
-        tab_idx = self.ui.meas_tab_plot.indexOf(
-            self.ui.meas_tab_plot.findChild(
-                QWidget, f"meas_tab_impact_{index}"
-            )
-        )
+        widget = self.tabs[index]
+        if not widget:
+            return
+
+        tab_idx = self.ui.meas_tab_plot.indexOf(widget)
+        if tab_idx == -1:
+            return
+
+        icon = self.style().standardIcon(
+            QStyle.StandardPixmap.SP_DialogCancelButton) if mark else QIcon()
         self.ui.meas_tab_plot.setTabIcon(tab_idx, icon)
 
     def setup_plot_lines(self, channels, start_idx, end_idx):
@@ -127,7 +108,6 @@ class MeasPlotWidget(QWidget):
         new_plot.setObjectName(name)
         new_plot.setBackground("w")
         new_plot.show()
-
         self.qt_graphs.append(new_plot)
 
     def create_plot_view(self, qt_graph, exc_name, resp_name):
@@ -177,12 +157,6 @@ class MeasPlotWidget(QWidget):
                     time[start:], row[start:].tolist()
                 )
 
-    # def check_plots(self, exc_ndim, resp_ndim):
-    #     if len(self.exc_plot.items) != exc_ndim:
-    #         self.create_plot_lines(self.exc_plot, exc_ndim)
-    #     if len(self.resp_plot.items) != resp_ndim:
-    #         self.create_plot_lines(self.resp_plot, resp_ndim)
-
     def create_plot_lines(self, plot, number_of_lines):
         for i in range(0, number_of_lines):
             pen = pg.mkPen(
@@ -195,8 +169,8 @@ class MeasPlotWidget(QWidget):
             plot.plot(pen=pen, name="")
 
     def clear(self):
-        for i in range(0, len(self.resp_plots)):
-            pass
+        # for i in range(0, len(self.resp_plots)):
+        pass
 
     def reset(self):
         self.exc_plots = []
@@ -206,4 +180,3 @@ class MeasPlotWidget(QWidget):
             self.ui.meas_tab_plot.removeTab(i)
         self.tabs.clear()
         self.ui.meas_tab_plot.clear()
-

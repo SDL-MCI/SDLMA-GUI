@@ -18,9 +18,9 @@ from PySide6.QtCore import (
     QPoint,
     QRect,
     QSize,
-    Qt,
     QTime,
     QUrl,
+    Qt,
 )
 from PySide6.QtGui import (
     QBrush,
@@ -59,7 +59,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName("Dialog")
-        Dialog.resize(707, 810)
+        Dialog.resize(361, 757)
         self.centralwidget = QWidget(Dialog)
         self.centralwidget.setObjectName("centralwidget")
         self.centralwidget.setGeometry(QRect(0, 0, 351, 751))

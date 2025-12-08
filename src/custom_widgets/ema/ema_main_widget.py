@@ -6,11 +6,10 @@ from PySide6.QtWidgets import QDialog, QFileDialog, QWidget
 from sdlma_modal_analysis.sdlma_ema import SDLMAEMA
 from sdlma_modal_analysis.sdlma_measurement import SDLMAMeasurement
 
-from models.task_model import data_proto, row_count_proto
+from models.ema_models import EMAModel, SignalModel
 from ui import sdlma_meas_gui
 
 
-# https://github.com/pyqtgraph/pyqtgraph/blob/4951bd743ef7e2a5198615573167301c9603b72f/examples/linkedViews.py
 class EmaMainWidget(QWidget):
 
     def __init__(self, parent=None, *args, **kwargs):
@@ -269,27 +268,3 @@ class MeasurementWindow(QDialog):
             if signal.selected:
                 sel_signals.append(signal)
         return sel_signals
-
-
-class SignalModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, signals=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.signals = signals or []
-
-    def data(self, index, role):
-        return data_proto(self.signals, index, role)
-
-    def rowCount(self, index):
-        return row_count_proto(self.signals)
-
-
-class EMAModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, measurements=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.measurements = measurements or []
-
-    def data(self, index, role):
-        return data_proto(self.measurements, index, role)
-
-    def rowCount(self, index):
-        return row_count_proto(self.measurements)
